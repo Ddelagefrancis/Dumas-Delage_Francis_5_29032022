@@ -52,3 +52,25 @@ async function writeHtmlProduct() {
 writeHtmlProduct();
 
 
+// Ecoute du clic sur le panier
+// ajouter produit dans LocalStorage pour pouvoir recuperer ensuite dans le pannier
+
+let btnAddToCart = document.getElementById("addToCart");
+console.log(btnAddToCart);
+btnAddToCart.addEventListener("click", () => {
+    let cartTableau = JSON.parse(localStorage.getItem(addToCart));
+    console.log(cartTableau);
+
+    // condition de sélection d'une quantité et d'une couleur pour pouvoir ajouter au panier
+    if (document.querySelector("#colors").value == "" || document.querySelector("#quantity").value <= "0") {
+        alert("Merci de renseigner une couleur et/ou une quantité");
+        return;
+    }
+
+    let fusionProduitsValeurs = {
+        id: dataProduct._id,
+        color: document.querySelector("#colors").value,
+        quantity: document.querySelector("#quantity").value,
+    }
+    console.log(fusionProduitsValeurs);
+})
