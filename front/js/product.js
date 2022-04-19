@@ -1,8 +1,8 @@
-// Récupération de l'id via l'url
+// -----Récupération de l'id via l'url-----
 const idProduct = new URL(window.location.href).searchParams.get("id");
-    // console.log(idProduct);
+// console.log(idProduct);
 
-// Récupération de l'article de son id
+// -----Récupération de l'article de son id-----
 let dataProduct = [];
 
 async function fetchProductById(id) {
@@ -15,7 +15,7 @@ async function fetchProductById(id) {
         });
 };
 
-// Récupération des sélecteurs
+// -----Récupération des sélecteurs-----
 let imgProduct = document.querySelector(".item__img");
 let titleProduct = document.getElementById("title");
 let priceProduct = document.getElementById("price");
@@ -26,7 +26,7 @@ let img = document.createElement("img");
 imgProduct.appendChild(img);
 
 
-// Affichage des données dans la page produit
+// -----Affichage des données dans la page produit-----
 async function writeHtmlProduct() {
     await fetchProductById(idProduct);
 
@@ -51,26 +51,54 @@ async function writeHtmlProduct() {
 
 writeHtmlProduct();
 
+// -----Ecoute du clic sur le panier-----
+// -----ajouter produit dans LocalStorage pour pouvoir recuperer ensuite dans le pannier-----
+document.querySelector("#addToCart").addEventListener('click', () => {
 
-// Ecoute du clic sur le panier
-// ajouter produit dans LocalStorage pour pouvoir recuperer ensuite dans le pannier
-
-let btnAddToCart = document.getElementById("addToCart");
-console.log(btnAddToCart);
-btnAddToCart.addEventListener("click", () => {
-    let cartTableau = JSON.parse(localStorage.getItem(addToCart));
-    console.log(cartTableau);
-
-    // condition de sélection d'une quantité et d'une couleur pour pouvoir ajouter au panier
     if (document.querySelector("#colors").value == "" || document.querySelector("#quantity").value <= "0") {
         alert("Merci de renseigner une couleur et/ou une quantité");
         return;
     }
 
-    let fusionProduitsValeurs = {
+// -----création d'un nouveau produit avec récupération des valeurs-----
+    let fusionProduitsValeurs = { 
         id: dataProduct._id,
         color: document.querySelector("#colors").value,
         quantity: document.querySelector("#quantity").value,
+        // console.log(fusionProduitsValeurs);
     }
-    console.log(fusionProduitsValeurs);
-})
+
+// -----récupération du panier dans le localstorage-----
+    let cartTableau = JSON.parse(localStorage.getItem("addToCart"));
+
+// -----Ajouter produit selectionner, mais si même id et même color on incrémente-----
+// -----sinon ajouter produit non présent----- 
+    if (cartTableau == null) {
+        cartTableau = [];
+        cartTableau.push(fusionProduitsValeurs);
+        // console.log(cartTableau);
+    }
+    else {
+        let existCartTableau = false;
+        let incrementeProduit;
+        cartTableau.forEach(item => {
+            // -----verification de l existance du produit dans le panier ainsi que même color même id-----
+            // -----récupération de sont index-----
+            switch (item.color + item.id) {
+                case fusionProduitsValeurs.color + fusionProduitsValeurs.id:
+                    existCartTableau = true;
+                    incrementeProduit = cartTableau.indexOf(item);
+            }
+        })
+        if (existCartTableau) {
+            cartTableau[incrementeProduit].quantity = +cartTableau[incrementeProduit].quantity + + fusionProduitsValeurs.quantity;
+        }
+        else {
+            cartTableau.push(fusionProduitsValeurs);
+        }
+    }
+
+// -----ajout dans le localstorage-----
+    localStorage.setItem("addToCart", JSON.stringify(cartTableau));
+    console.table(cartTableau);
+}) 
