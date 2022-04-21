@@ -34,13 +34,10 @@ async function writeHtmlProduct() {
     img.setAttribute("alt", dataProduct.altTxt);
 
     document.title = dataProduct.name;
-    // console.log(dataProduct.name);
+    
     titleProduct.innerHTML = dataProduct.name;
-    // console.log(dataProduct.price);
     priceProduct.innerHTML = dataProduct.price;
-    // console.log(dataProduct.description);
     descriptionProduct.innerHTML = dataProduct.description;
-
     for (let i = 0; i < dataProduct.colors.length; i++) {
         let color = document.createElement("option");
         color.setAttribute("value", dataProduct.colors[i]);
