@@ -3,11 +3,11 @@ let cartTableau = JSON.parse(localStorage.getItem("addToCart"));
 console.log(cartTableau);
 
 
-async function renderCart() {
+function renderCart() {
     if (cartTableau) {
         // -----Récupération des infos manquantes via l'API-----
         for (let product of cartTableau) {
-            await fetch(`http://localhost:3000/api/products/${product.id}`)
+            fetch(`http://localhost:3000/api/products/${product.id}`)
                 .then((response) => response.json())
                 .then(function (productApi) {
 
@@ -15,6 +15,8 @@ async function renderCart() {
                     let productArticle = document.createElement("article");
                     document.querySelector("#cart__items").appendChild(productArticle);
                     productArticle.className = "cart__item";
+                    productArticle.setAttribute('data-id', product.id);
+                    productArticle.setAttribute('data-color', product.color);
 
                     // Insertion de l'élément "div" pour l'image produit
                     let productDivImg = document.createElement("div");
@@ -89,25 +91,9 @@ async function renderCart() {
                     productDelete.className = "deleteItem";
                     productDelete.innerHTML = "Supprimer";
 
-                    // Suppression pour chaque clique
-                    productDelete.addEventListener("click", (e) => {
-                        e.preventDefault;
-
-                        // Récupération de l'id et de la couleur du produit
-                        let deleteId = product.id;
-                        let deleteColor = product.color;
-
-                        // Suppression du produit
-                        removeProduct(deleteId, deleteColor);
-                        if (cartTableau.length === 0) {
-                            localStorage.clear();
-                            window.location.reload();
-                        }
-                        window.location.reload();
-                    })
                     totalPrice(productApi);
                     modifyQuantity()
-                    // removeProduct();
+                    removeProduct();
                     calculeTotals();
                 });
             totalQuantity();
@@ -173,37 +159,34 @@ function modifyQuantity() {
     }
 }
 
-// -----Fonction pour Supprimer l'article au clic-----
-// function removeProduct() {
-//     let itemToRemove = document.getElementsByClassName("cart__item");
-//     let btnRemove = document.getElementsByClassName("deleteItem");
-
-//     for (let i = 0; i < btnRemove.length; i++) {
-//         let remove = btnRemove[i];
-//         remove.addEventListener('click', () => {
-//             cartTableau.splice(i, 1); // On supprime l'article du localstorage avec splice (i est sont index et 1 la quantité)
-//             itemToRemove[i].remove(); // On supprime l'article du DOM 
-//             localStorage.setItem("addToCart", JSON.stringify(cartTableau));
-//             if (cartTableau.length === 0) {
-//                 localStorage.clear();
-//                 window.location.reload();
-//             }
-//             calculeTotals();
-           
-//         })
-//     }
-// }
-
-function removeProduct(id, color) {
+// Fonction pour supprimer le produit avec l'id et la couleur correspondante
+function removeFromCart(id, color) {
     cartTableau = cartTableau.filter(product => {
         if (product.id == id && product.color == color) {
-           return false;
+            return false;
         }
         return true;
     });
-
     localStorage.setItem("addToCart", JSON.stringify(cartTableau));
 };
-
+function removeProduct() {
+    document.querySelectorAll(".deleteItem").forEach(button => {
+        // Pour chaque clique
+        button.addEventListener("click", (e) => {
+            // Récupération de l'id et de la couleur du produit
+            let removeId = e.target.closest('article').getAttribute('data-id');
+            let removeColor = e.target.closest('article').getAttribute('data-color');
+            
+            // Suppression du produit
+            removeFromCart(removeId, removeColor);
+            if (cartTableau.length === 0) {
+                localStorage.clear();
+                window.location.reload();
+            }
+            // Actualisation de la page
+            window.location.reload();
+        });
+    })
+}
 
 // -----Validation Formulaire + envoie de la commande-----
