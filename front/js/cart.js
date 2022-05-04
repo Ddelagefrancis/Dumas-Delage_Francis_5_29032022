@@ -159,7 +159,7 @@ function modifyQuantity() {
     }
 }
 
-// Fonction pour supprimer le produit avec l'id et la couleur correspondante
+// -----Fonction pour supprimer le produit avec l'id et la couleur correspondante-----
 function removeFromCart(id, color) {
     cartTableau = cartTableau.filter(product => {
         if (product.id == id && product.color == color) {
@@ -176,7 +176,7 @@ function removeProduct() {
             // Récupération de l'id et de la couleur du produit
             let removeId = e.target.closest('article').getAttribute('data-id');
             let removeColor = e.target.closest('article').getAttribute('data-color');
-            
+
             // Suppression du produit
             removeFromCart(removeId, removeColor);
             if (cartTableau.length === 0) {
@@ -190,3 +190,118 @@ function removeProduct() {
 }
 
 // -----Validation Formulaire + envoie de la commande-----
+function checkForm(test) {
+    // Instauration formulaire avec regex
+    let emailRegex = new RegExp('^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$');
+    let adresseRegex = new RegExp("^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+");
+    let cityRegex = new RegExp("^[a-zA-Z-Zàâäéèêëïîôöùûüç ,.'-]+$");
+    let namesRegex = new RegExp("^[a-zA-Z-Zàâäéèêëïîôöùûüç ,.'-]+$");
+
+    // On met à zéro les messages d'erreurs 
+    document.getElementById('firstNameErrorMsg').innerText = "";
+    document.getElementById('lastNameErrorMsg').innerText = "";
+    document.getElementById('addressErrorMsg').innerText = "";
+    document.getElementById('cityErrorMsg').innerText = "";
+    document.getElementById('emailErrorMsg').innerText = "";
+
+    // On vérifie pour chaques input que les regex soient bien respecté    
+    let validFirstName = test.firstName;
+    if (!namesRegex.test(validFirstName)) {
+        let firstNameErrorMsg = document.getElementById('firstNameErrorMsg');
+        firstNameErrorMsg.innerText = "Veuillez renseigner un prénom valide";
+        return false;
+    }
+
+    let validLastName = test.lastName;
+    if (!namesRegex.test(validLastName)) {
+        let firstNameErrorMsg = document.getElementById('lastNameErrorMsg');
+        firstNameErrorMsg.innerText = "Veuillez renseigner un nom valide";
+        return false;
+    }
+    let validAddress = test.address;
+    if (!adresseRegex.test(validAddress)) {
+        let firstNameErrorMsg = document.getElementById('addressErrorMsg');
+        firstNameErrorMsg.innerText = "Veuillez renseigner une adresse valide";
+        return false;
+    }
+
+    let validCity = test.city;
+    if (!cityRegex.test(validCity)) {
+        let firstNameErrorMsg = document.getElementById('cityErrorMsg');
+        firstNameErrorMsg.innerText = "Veuillez renseigner une ville valide";
+        return false;
+    }
+    let validEmail = test.email;
+    if (!emailRegex.test(validEmail)) {
+        let firstNameErrorMsg = document.getElementById('emailErrorMsg');
+        firstNameErrorMsg.innerText = "Veuillez renseigner une adresse mail valide";
+        return false;
+    } else {
+        // Si tous les inputs sont correctement remplis la fonction retourne true
+        return true;
+    }
+};
+
+// -----Fonction qui récupère le formulaire de contact, le panier et redirige vers la page confirmation-----
+function postForm() {
+    const order = document.getElementById("order");
+    order.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        // On récupère les données du formulaire dans un objet
+        const contact = {
+            firstName: document.getElementById("firstName").value,
+            lastName: document.getElementById("lastName").value,
+            address: document.getElementById("address").value,
+            city: document.getElementById("city").value,
+            email: document.getElementById("email").value,
+        }
+        // On vérifit que le formulaire est complet 
+        if (checkForm(contact)) {
+            // On vérifit que le panier ne soit pas vide 
+            if (cartTableau.length < 1) {
+                console.log("Votre panier est vide");
+            } else {
+                // On créé un tableau pour ajouter tous les id du panier 
+                let products = [];
+                for (let i = 0; i < cartTableau.length; i++) {
+                    products.push(cartTableau[i].id);
+                }
+                console.log(products);
+
+                // On créé un objet avec les valeurs du formulaire et les produits du panier
+                let sendFormData = {
+                    contact,
+                    products,
+                };
+
+                // On définit dans une variable les informations pour le POST 
+                const options = {
+                    method: "POST",
+                    body: JSON.stringify(sendFormData),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                };
+
+                // On requête l'API avec la méthode POST
+                fetch("http://localhost:3000/api/products/order", options)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        localStorage.setItem("orderId", data.orderId);
+
+                        document.location.href = "confirmation.html?id=" + data.orderId;
+                    })
+                    .catch((err) => {
+                        alert("Oups, le serveur rencontre un problème." + err.message);
+                    });
+            }
+        } else {
+            alert("Veuillez vérifier que le formulaire soit bien rempli.")
+            return null
+        }
+    });
+};
+postForm()
