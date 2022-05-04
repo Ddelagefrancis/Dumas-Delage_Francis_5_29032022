@@ -52,7 +52,7 @@ writeHtmlProduct();
 // -----ajouter produit dans LocalStorage pour pouvoir recuperer ensuite dans le pannier-----
 document.querySelector("#addToCart").addEventListener('click', () => {
 
-    if (document.querySelector("#colors").value == "" || document.querySelector("#quantity").value <= "0") {
+    if (document.querySelector("#colors").value == "" || document.querySelector("#quantity").value == "0" || document.querySelector("#quantity").value >= 101) {
         alert("Merci de renseigner une couleur et/ou une quantité");
         return;
     }
