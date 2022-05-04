@@ -15,6 +15,8 @@ function renderCart() {
                     let productArticle = document.createElement("article");
                     document.querySelector("#cart__items").appendChild(productArticle);
                     productArticle.className = "cart__item";
+
+                    // Création des dataset pour faciliter le ciblage de chaque produit dans la page panier
                     productArticle.setAttribute('data-id', product.id);
                     productArticle.setAttribute('data-color', product.color);
 
@@ -53,7 +55,9 @@ function renderCart() {
                     let productPrice = document.createElement("p");
                     productItemContentDescription.appendChild(productPrice);
                     productPrice.innerHTML = productApi.price + " €";
-                    product.price = productApi.price; // Création de la key price et récupération du prix
+                    
+                    // Création de la key price et récupération du prix
+                    product.price = productApi.price; 
 
                     // Insertion de l'élément "div"
                     let productItemContentSettings = document.createElement("div");
