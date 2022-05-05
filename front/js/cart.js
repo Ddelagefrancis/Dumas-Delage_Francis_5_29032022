@@ -263,7 +263,7 @@ function postForm() {
         // On vérifit que le formulaire est complet 
         if (checkForm(contact)) {
             // On vérifit que le panier ne soit pas vide 
-            if (cartTableau.length < 1) {
+            if (cartTableau == null) {
                 console.log("Votre panier est vide");
             } else {
                 // On créé un tableau pour ajouter tous les id du panier 
