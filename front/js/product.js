@@ -13,8 +13,9 @@ async function fetchProductById(id) {
             dataProduct = promise
             // console.log(dataProduct);
         })
-        .catch(() => {
-            alert("Oups, le serveur rencontre un problème. ");
+        .catch((err) => {
+            alert("Oups, le serveur rencontre un problème.");
+            console.log(err);
         });
 };
 
