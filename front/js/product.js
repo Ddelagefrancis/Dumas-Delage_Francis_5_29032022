@@ -12,6 +12,9 @@ async function fetchProductById(id) {
             // console.log(promise);
             dataProduct = promise
             // console.log(dataProduct);
+        })
+        .catch(() => {
+            alert("Oups, le serveur rencontre un problème. ");
         });
 };
 
