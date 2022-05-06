@@ -55,9 +55,9 @@ function renderCart() {
                     let productPrice = document.createElement("p");
                     productItemContentDescription.appendChild(productPrice);
                     productPrice.innerHTML = productApi.price + " €";
-                    
+
                     // Création de la key price et récupération du prix
-                    product.price = productApi.price; 
+                    product.price = productApi.price;
 
                     // Insertion de l'élément "div"
                     let productItemContentSettings = document.createElement("div");
@@ -194,7 +194,7 @@ function removeProduct() {
 }
 
 // -----Validation Formulaire + envoie de la commande-----
-function checkForm(test) {
+function checkForm(form) {
     // Instauration formulaire avec regex
     let emailRegex = new RegExp('^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$');
     let adresseRegex = new RegExp("^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+");
@@ -209,33 +209,33 @@ function checkForm(test) {
     document.getElementById('emailErrorMsg').innerText = "";
 
     // On vérifie pour chaques input que les regex soient bien respecté    
-    let validFirstName = test.firstName;
+    let validFirstName = form.firstName;
     if (!namesRegex.test(validFirstName)) {
         let firstNameErrorMsg = document.getElementById('firstNameErrorMsg');
         firstNameErrorMsg.innerText = "Veuillez renseigner un prénom valide";
         return false;
     }
 
-    let validLastName = test.lastName;
+    let validLastName = form.lastName;
     if (!namesRegex.test(validLastName)) {
         let firstNameErrorMsg = document.getElementById('lastNameErrorMsg');
         firstNameErrorMsg.innerText = "Veuillez renseigner un nom valide";
         return false;
     }
-    let validAddress = test.address;
+    let validAddress = form.address;
     if (!adresseRegex.test(validAddress)) {
         let firstNameErrorMsg = document.getElementById('addressErrorMsg');
         firstNameErrorMsg.innerText = "Veuillez renseigner une adresse valide";
         return false;
     }
 
-    let validCity = test.city;
+    let validCity = form.city;
     if (!cityRegex.test(validCity)) {
         let firstNameErrorMsg = document.getElementById('cityErrorMsg');
         firstNameErrorMsg.innerText = "Veuillez renseigner une ville valide";
         return false;
     }
-    let validEmail = test.email;
+    let validEmail = form.email;
     if (!emailRegex.test(validEmail)) {
         let firstNameErrorMsg = document.getElementById('emailErrorMsg');
         firstNameErrorMsg.innerText = "Veuillez renseigner une adresse mail valide";
@@ -279,34 +279,38 @@ function postForm() {
                     contact,
                     products,
                 };
-
-                // On définit dans une variable les informations pour le POST 
-                const options = {
-                    method: "POST",
-                    body: JSON.stringify(sendFormData),
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                };
-
-                // On requête l'API avec la méthode POST
-                fetch("http://localhost:3000/api/products/order", options)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                        localStorage.setItem("orderId", data.orderId);
-
-                        document.location.href = "confirmation.html?id=" + data.orderId;
-                    })
-                    .catch((err) => {
-                        alert("Oups, le serveur rencontre un problème." + err.message);
-                    });
-            }
-        } else {
+                sendPost(sendFormData);
+            };
+        }
+        else {
             alert("Veuillez vérifier que le formulaire soit bien rempli.")
             return null
         }
-    });
-};
+    })
+}
 postForm()
+
+// -----Fonction qui redirige vers la page confirmation-----
+function sendPost(sendFormData) {
+    const post = {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sendFormData),
+    };
+
+    // On requête l'API avec la méthode POST
+    fetch("http://localhost:3000/api/products/order", post)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            localStorage.setItem("orderId", data.orderId);
+
+            document.location.href = "confirmation.html?id=" + data.orderId;
+        })
+        .catch((err) => {
+            alert("Oups, le serveur rencontre un problème." + err.message);
+        });
+}
